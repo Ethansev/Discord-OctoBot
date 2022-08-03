@@ -17,7 +17,7 @@ client.on("messageCreate", async msg => {
     //console.log(msg);
     //if (msg.author.client) return;
     if(msg.content.includes(":bettermoyai:")) {
-        msg.reply('othermoyai:853487746433286145');
+        msg.reply('stop bothering me');
     }
 });
 
