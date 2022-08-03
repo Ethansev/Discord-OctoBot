@@ -1,6 +1,7 @@
 import 'dotenv/config'; //ES6!! 
+import axios from 'axios';
 import { Client, GatewayIntentBits} from 'discord.js';
-import express from 'express';
+import express, { response } from 'express';
 const client = new Client({
     intents:[ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers ],
     partials: [ 'MESSAGE', 'CHANNEL', 'REACTION' ]
@@ -23,17 +24,34 @@ client.on("messageCreate", async msg => {
     if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:1004468892334297148>");
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
     if(msg.content.includes("🗿")) msg.reply("fuck off");
+
+    const momValue = ['mommy', 'mother', 'mama', 'momma', 'mom'];
+    for(let val of momValue){
+        console.log(val);
+        if(msg.content.includes(val)){
+            let getYourMomJoke = async () => {
+                let response = await axios.get(`https://api.yomomma.info/`);
+                let joke = response.data.joke;
+                return joke;
+            }
+            let jokeValue = await getYourMomJoke();
+            console.log(jokeValue);
+            msg.reply(jokeValue);
+            return;
+        } 
+    }
     //if(msg.content.includes("hello")) msg.reply("yes you");
 }); 
 
 client.on("guildMemberAdd", async member => {
-    console.log(member);
+    //this code changes the nickname then finds a specific channel in their guild and sends a message to that channel. 
+    //console.log(member);
     member.setNickname(`${member.user.username}poo`);
     const channel = member.guild.channels.cache.find(ch => ch.name === 'bot-commands');
     channel ? channel.send(`Hi ${member}. We added ~poo to your name!`) : null;
+
     //channel.send(`Hi ${member.user.username}. We added ~poo to your name!`);
-    //client.channels.cache.get(process.env.BOT_CHANNEL).send(`Hi ${member.user.username}. We added ~poo to your name!`);
-    //will eventually change this hard-coded channel to a variable
+    //client.channels.cache.get(process.env.BOT_CHANNEL).send(`Hi ${member.user.username}. We added ~poo to your name!`); //hard-coding a channel id
 });
 
 client.login(process.env.DISCORD_TOKEN); 
