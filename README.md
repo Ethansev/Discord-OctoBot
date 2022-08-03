@@ -8,6 +8,7 @@
 ### Future Plans
 - [ ] Add extra api functionalities
 - [ ] Add slash commands
+- [ ] Add twitch stream announcement for Sid
 
 <!-- 
 Purpose 

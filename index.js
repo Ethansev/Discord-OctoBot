@@ -1,10 +1,10 @@
+import 'dotenv/config'; //ES6!! 
 import { Client, GatewayIntentBits} from 'discord.js';
 import express from 'express';
 const client = new Client({
     intents:[ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers ],
     partials: [ 'MESSAGE', 'CHANNEL', 'REACTION' ]
 });
-import 'dotenv/config'; //ES6!! 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,16 +18,18 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async msg => {
-    //console.log(msg);
+    //console.log(msg); for testing purposes
     //if (msg.author.client) return;
-    if(msg.content.includes(":bettermoyai:")) {
-        msg.reply('stop bothering me');
-    }
+    if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:853487746433286145>");
+    if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
+    if(msg.content.includes("🗿")) msg.reply("fuck off");
+    //if(msg.content.includes("hello")) msg.reply("yes you");
 }); 
 
 client.on("guildMemberAdd", async member => {
     member.setNickname(`${member.user.username}poo`);
-    client.channels.cache.get('908622072744407050').send(`Hi ${member.user.username}. We added ~poo to your name!`);
+    client.channels.cache.get(process.env.BOT_CHANNEL).send(`Hi ${member.user.username}. We added ~poo to your name!`);
+    //will eventually change this hard-coded channel to a variable
 });
 
 client.login(process.env.DISCORD_TOKEN); 
