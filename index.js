@@ -31,3 +31,9 @@ client.on("guildMemberAdd", async member => {
 });
 
 client.login(process.env.DISCORD_TOKEN); 
+
+app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
+}).on('error', err => {
+    console.log(err);
+}); 
