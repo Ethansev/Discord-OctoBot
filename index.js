@@ -25,8 +25,8 @@ client.on("messageCreate", async msg => {
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
     if(msg.content.includes("🗿")) msg.reply("fuck off");
 
-    const momValue = ['mommy', 'mother', 'mama', 'momma', 'mom'];
-    for(let val of momValue){
+    const yourMom = ['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma'];
+    for(let val of yourMom){
         console.log(val);
         if(msg.content.includes(val)){
             let getYourMomJoke = async () => {
@@ -40,7 +40,6 @@ client.on("messageCreate", async msg => {
             return;
         } 
     }
-    //if(msg.content.includes("hello")) msg.reply("yes you");
 }); 
 
 client.on("guildMemberAdd", async member => {
