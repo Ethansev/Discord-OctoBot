@@ -19,16 +19,20 @@ client.on("ready", () => {
 
 client.on("messageCreate", async msg => {
     //console.log(msg); for testing purposes
-    //if (msg.author.client) return;
-    if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:853487746433286145>");
+    if (msg.author.bot) return;
+    if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:1004468892334297148>");
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
     if(msg.content.includes("🗿")) msg.reply("fuck off");
     //if(msg.content.includes("hello")) msg.reply("yes you");
 }); 
 
 client.on("guildMemberAdd", async member => {
+    console.log(member);
     member.setNickname(`${member.user.username}poo`);
-    client.channels.cache.get(process.env.BOT_CHANNEL).send(`Hi ${member.user.username}. We added ~poo to your name!`);
+    const channel = member.guild.channels.cache.find(ch => ch.name === 'bot-commands');
+    channel ? channel.send(`Hi ${member}. We added ~poo to your name!`) : null;
+    //channel.send(`Hi ${member.user.username}. We added ~poo to your name!`);
+    //client.channels.cache.get(process.env.BOT_CHANNEL).send(`Hi ${member.user.username}. We added ~poo to your name!`);
     //will eventually change this hard-coded channel to a variable
 });
 
