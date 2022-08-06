@@ -1,6 +1,6 @@
 import 'dotenv/config'; //ES6!! 
 import axios from 'axios';
-import { Client, GatewayIntentBits} from 'discord.js';
+import { Client, GatewayIntentBits, ImageFormat} from 'discord.js';
 import express, { response } from 'express';
 const client = new Client({
     intents:[ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers ],
@@ -19,15 +19,26 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async msg => {
-    //console.log(msg); for testing purposes
-    if (msg.author.bot) return;
+    if(msg.author.bot) return;
+    console.log('SEPARATION TEST BECAUSE IDK WHAT\'S HAPPENING');
+    console.log(msg);
+    let joel = 240328297483993091;
+    let newInvite = await msg.channel.createInvite({maxAge:0, maxUses:0});
+
+    if(msg.author.id == 349993271642292224 && msg.system === false){
+        await msg.author.send({files: ["./media/Ether_Griffguyen.png"]});
+        await msg.author.send(`fuck you Joel ${newInvite}`);
+        const member = msg.guild.members.cache.get(msg.author.id);
+        member.kick();
+    }
+
     if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:1004468892334297148>");
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
     if(msg.content.includes("🗿")) msg.reply("fuck off");
 
     const yourMom = ['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma'];
     for(let val of yourMom){
-        console.log(val);
+        //console.log(val);
         if(msg.content.includes(val)){
             let getYourMomJoke = async () => {
                 let response = await axios.get(`https://api.yomomma.info/`);
