@@ -25,17 +25,17 @@ client.on("messageCreate", async msg => {
     if(msg.author.bot) return;
     //console.log(msg);
     let joel = 240328297483993091;
-    let newInvite = await msg.channel.createInvite({maxAge:0, maxUses:0});
-    let randomQuote = quotesData[Math.floor(Math.random() * quotesData.length)];
+    // let newInvite = await msg.channel.createInvite({maxAge:0, maxUses:0});
+    // let randomQuote = quotesData[Math.floor(Math.random() * quotesData.length)];
 
-    if(msg.author.id == joel && msg.system === false){
-        await msg.author.send({files: ["./media/Ether_Griffguyen.png"]});
-        await msg.author.send(`fuck you Joel ${newInvite}`);
-        const member = msg.guild.members.cache.get(msg.author.id);
-        const channel = msg.guild.channels.cache.find(ch => ch.name === 'bot-commands');
-        channel ? channel.send(`"*${randomQuote.quote}*" - ${randomQuote.author} \n\n**Joel got dicked :)**`) : null;
-        member.kick();
-    }
+    // if(msg.author.id == joel && msg.system === false){
+    //     await msg.author.send({files: ["./media/Ether_Griffguyen.png"]});
+    //     await msg.author.send(`fuck you Joel ${newInvite}`);
+    //     const member = msg.guild.members.cache.get(msg.author.id);
+    //     const channel = msg.guild.channels.cache.find(ch => ch.name === 'bot-commands');
+    //     channel ? channel.send(`"*${randomQuote.quote}*" - ${randomQuote.author} \n\n**Joel got dicked :)**`) : null;
+    //     member.kick();
+    // }
 
     if(msg.content.includes(":bettermoyai:")) msg.reply("<:othermoyai:1004468892334297148>");
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
