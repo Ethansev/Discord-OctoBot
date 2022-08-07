@@ -2,6 +2,9 @@ import 'dotenv/config'; //ES6!!
 import axios from 'axios';
 import { Client, GatewayIntentBits, ImageFormat} from 'discord.js';
 import express, { response } from 'express';
+
+import {quotesData} from './seeds/callOfDutyQuotes.js';
+
 const client = new Client({
     intents:[ GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers ],
     partials: [ 'MESSAGE', 'CHANNEL', 'REACTION' ]
@@ -20,15 +23,17 @@ client.on("ready", () => {
 
 client.on("messageCreate", async msg => {
     if(msg.author.bot) return;
-    console.log('SEPARATION TEST BECAUSE IDK WHAT\'S HAPPENING');
-    console.log(msg);
+    //console.log(msg);
     let joel = 240328297483993091;
     let newInvite = await msg.channel.createInvite({maxAge:0, maxUses:0});
+    let randomQuote = quotesData[Math.floor(Math.random() * quotesData.length)];
 
-    if(msg.author.id == 349993271642292224 && msg.system === false){
+    if(msg.author.id == joel && msg.system === false){
         await msg.author.send({files: ["./media/Ether_Griffguyen.png"]});
         await msg.author.send(`fuck you Joel ${newInvite}`);
         const member = msg.guild.members.cache.get(msg.author.id);
+        const channel = msg.guild.channels.cache.find(ch => ch.name === 'bot-commands');
+        channel ? channel.send(`${randomQuote.quote} - ${randomQuote.author} \n\nJoel was dicked`) : null;
         member.kick();
     }
 
