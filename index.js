@@ -33,7 +33,7 @@ client.on("messageCreate", async msg => {
         await msg.author.send(`fuck you Joel ${newInvite}`);
         const member = msg.guild.members.cache.get(msg.author.id);
         const channel = msg.guild.channels.cache.find(ch => ch.name === 'bot-commands');
-        channel ? channel.send(`${randomQuote.quote} - ${randomQuote.author} \n\nJoel was dicked`) : null;
+        channel ? channel.send(`"*${randomQuote.quote}*" - ${randomQuote.author} \n\n**Joel got dicked :)**`) : null;
         member.kick();
     }
 
