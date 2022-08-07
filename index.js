@@ -42,19 +42,20 @@ client.on("messageCreate", async msg => {
     if(msg.content.includes("🗿")) msg.reply("fuck off");
 
     const yourMom = ['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma'];
-    for(let val of yourMom){
-        //console.log(val);
-        if(msg.content.includes(val)){
-            let getYourMomJoke = async () => {
-                let response = await axios.get(`https://api.yomomma.info/`);
-                let joke = response.data.joke;
-                return joke;
-            }
-            let jokeValue = await getYourMomJoke();
-            console.log(jokeValue);
-            msg.reply(jokeValue);
-            return;
-        } 
+    for(let word of msg.content.split(' ')){
+        for(let val of yourMom){
+            if(word.toLowerCase() === val){
+                let getYourMomJoke = async () => {
+                    let response = await axios.get(`https://api.yomomma.info/`);
+                    let joke = response.data.joke;
+                    return joke;
+                }
+                let jokeValue = await getYourMomJoke();
+                console.log(jokeValue);
+                msg.reply(jokeValue);
+                return;
+            }    
+        }
     }
 }); 
 
