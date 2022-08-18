@@ -41,7 +41,7 @@ client.on("messageCreate", async msg => {
     if(msg.content.includes(":othermoyai:")) msg.reply("<:bettermoyai:1004470188877561977>");
     if(msg.content.includes("🗿")) msg.reply("fuck off");
 
-    const yourMom = ['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma'];
+    const yourMom = ['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma', 'mum'];
     for(let word of msg.content.split(' ')){
         for(let val of yourMom){
             if(word.toLowerCase() === val){
