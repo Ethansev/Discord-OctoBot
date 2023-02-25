@@ -5,11 +5,12 @@
  - Adds -poo to the end of new user's name. (The theme of the server is toilet paper)
  - Responds to certain emojis with another emoji. 
  - Tells a your momma joke anytime the word mom (and other iterations) are typed. 
+ - Added slash commands for ChatGPT (new)
  - <s>Kicks Joel out of the server whenever he types in chat. </s>
 
 ## Future Plans
 - [ ] Add extra api functionalities
-- [ ] Add slash commands for ChatGPT
+- [x] <s>Add slash commands for ChatGPT</s>
 - [ ] Add twitch stream announcement for Sid
 
 <!-- 
