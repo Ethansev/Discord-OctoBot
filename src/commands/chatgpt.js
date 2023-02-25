@@ -17,7 +17,7 @@ const openai = new OpenAIApi(configuration);
 const command = {
   data: new SlashCommandBuilder()
 	  .setName('chatgpt')
-	  .setDescription('Give any prompt and let AI return a predicted completion!')
+	  .setDescription('Give any prompt and let AI respond.')
     .addStringOption(option => 
       option
         .setName('prompt')
