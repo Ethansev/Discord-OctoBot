@@ -29,13 +29,14 @@ const command = {
     const openai = new OpenAIApi(configuration);
 
     const response = await openai.createCompletion({
-      model: 'davinci',
+      model: 'text-davinci-003',
       prompt: prompt,
       max_tokens: 450
     });
 
     console.log('response from openai');
     console.log(response.data);
+    console.log("end of console log ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     await interaction.reply(`Prompt: ${prompt} \n\n Answer: ${response.data.choices[0].text}`);
     // await interaction.reply(response.data.choices[0].text);
     
