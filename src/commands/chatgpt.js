@@ -29,7 +29,7 @@ const command = {
     const openai = new OpenAIApi(configuration);
 
     const response = await openai.createCompletion({
-      model: 'text-ada-001',
+      model: 'gpt-3.5-turbo',
       prompt: prompt,
       max_tokens: 450
     });
