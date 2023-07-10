@@ -1,10 +1,10 @@
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
-import { Command, SlashCommand } from '../@types/types';
+import { SlashCommand } from '../@types/types';
 
 // should probably move this to env file
 const configuration = new Configuration({
-  organization: 'org-UObui1CbtZH6VgPFzcceMB0K',
+  organization: process.env.OPENAI_ORG_KEY,
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -17,18 +17,31 @@ const command: SlashCommand = {
     ),
   async execute(interaction: CommandInteraction) {
     // could create a new interface instead of using any
+
     const prompt = (interaction.options as any).getString('prompt');
     const openai = new OpenAIApi(configuration);
 
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: prompt,
-      max_tokens: 450,
-    });
+    await interaction.deferReply();
 
-    console.log('response from openai');
-    console.log(response.data);
-    await interaction.reply(`Prompt: ${prompt} \n\n Answer: ${response.data.choices[0].text}`);
+    try {
+      const response = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: [{ role: 'system', content: prompt }],
+        max_tokens: 450,
+      });
+
+      // there are rarely more than one answer from chatgpt but just in case
+      let replyText = `Prompt: ${prompt} \n\n`;
+      response.data.choices.map((choice, index) => {
+        const content = (choice.message && choice.message.content) || '';
+        replyText = replyText.concat(`Answer ${index + 1}: ${content} \n\n`);
+      });
+
+      await interaction.editReply(replyText);
+    } catch (error: any) {
+      interaction.reply('Oh no we made an oopsie woopsie. 30 minute lunch break brb');
+      console.log(error.message);
+    }
   },
 };
 
