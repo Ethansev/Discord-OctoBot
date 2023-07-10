@@ -16,6 +16,7 @@ Discord bot for my personal server. Basic implementation but I'll continue to ad
 - [ ] Add music functionality for voice chat (spotify, youtube, soundcloud)
 - [ ] Add twitch stream announcement for Sid
 - [ ] Give bot a dick~ish personality and have it respond to users
+- [ ] Containerize in a docker container
 
 ## Patch Notes
 
