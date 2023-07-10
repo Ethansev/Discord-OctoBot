@@ -9,7 +9,7 @@ import {
 } from 'discord.js';
 import { readdirSync } from 'fs';
 import { BotEvent, SlashCommand } from './@types/types';
-import { color } from './utility/functions.js';
+import { color } from './utility/textColor.js';
 
 export class Client extends DiscordClient {
   slashCommands: Collection<String, SlashCommand>;
@@ -19,7 +19,7 @@ export class Client extends DiscordClient {
   eventsPath: string;
   cooldowns?: Collection<string, number>;
 
-  public constructor(commandsPath: string, eventsPath: string, token?: string, GuildId?: string) {
+  public constructor(token?: string, GuildId?: string) {
     super({
       intents: [
         GatewayIntentBits.Guilds,
@@ -30,8 +30,8 @@ export class Client extends DiscordClient {
       partials: [Partials.Message, Partials.Channel, Partials.Reaction],
     });
 
-    this.commandsPath = commandsPath;
-    this.eventsPath = eventsPath;
+    this.commandsPath = 'src/slashCommands';
+    this.eventsPath = 'src/events';
 
     this.slashCommands = new Collection();
     this.token = token || null;
@@ -39,9 +39,8 @@ export class Client extends DiscordClient {
     this.cooldowns = new Collection<string, number>();
   }
 
-  // Eventually move to these to their own class instead of leaving them in Client
+  // Eventually move to these to their own classes
 
-  // Load all the commands
   loadAllCommands = async () => {
     console.log('Loading commands...');
 
@@ -73,12 +72,13 @@ export class Client extends DiscordClient {
     }
   };
 
-  // Load all the events
   loadAllEvents = async () => {
     console.log('Loading events...');
+
     const eventFiles = readdirSync(this.eventsPath).filter(
       (f) => f.endsWith('.js') || f.endsWith('.ts')
     );
+
     for (const file of eventFiles) {
       // TODO: make the import better
       await import(`../${this.eventsPath}/${file}`).then((eventObject) => {

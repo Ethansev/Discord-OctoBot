@@ -16,8 +16,6 @@ const command: SlashCommand = {
       option.setName('prompt').setDescription('The user to ping').setRequired(true)
     ),
   async execute(interaction: CommandInteraction) {
-    // could create a new interface instead of using any
-
     const prompt = (interaction.options as any).getString('prompt');
     const openai = new OpenAIApi(configuration);
 
@@ -30,7 +28,6 @@ const command: SlashCommand = {
         max_tokens: 450,
       });
 
-      // there are rarely more than one answer from chatgpt but just in case
       let replyText = `Prompt: ${prompt} \n\n`;
       response.data.choices.map((choice, index) => {
         const content = (choice.message && choice.message.content) || '';

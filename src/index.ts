@@ -5,19 +5,7 @@ import { Client } from './Client.js';
 run();
 
 async function run() {
-  // const dev: boolean = process.env.NODE_ENV === 'development';
-  // const commandPaths: string = dev ? 'src/slashCommands' : 'dist/slashCommands';
-  // const eventsPath: string = dev ? 'src/events' : 'dist/events';
-
-  const commandPaths: string = 'src/slashCommands';
-  const eventsPath: string = 'src/events';
-
-  const client = new Client(
-    commandPaths,
-    eventsPath,
-    process.env.DISCORD_TOKEN,
-    process.env.BOT_CHANNEL
-  );
+  const client = new Client(process.env.DISCORD_TOKEN, process.env.BOT_CHANNEL);
 
   await client.loadAllEvents();
   await client.loadAllCommands();

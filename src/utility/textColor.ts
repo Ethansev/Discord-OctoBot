@@ -1,8 +1,4 @@
 import chalk from 'chalk';
-import { Client } from '../Client';
-import { readdirSync } from 'fs';
-import { BotEvent } from '../@types/types';
-import { Interaction } from 'discord.js';
 
 type colorType = 'text' | 'variable' | 'error';
 
