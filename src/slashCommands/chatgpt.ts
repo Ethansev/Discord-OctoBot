@@ -2,9 +2,8 @@ import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { SlashCommand } from '../@types/types';
 
-// should probably move this to env file
 const configuration = new Configuration({
-  organization: process.env.OPENAI_ORG_KEY,
+  organization: process.env.OPENAI_ORG_KEY, // Optional for most usage, preferred for enterprise usage
   apiKey: process.env.OPENAI_API_KEY,
 });
 
