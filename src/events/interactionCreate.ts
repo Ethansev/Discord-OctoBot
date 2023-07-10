@@ -1,52 +1,33 @@
-import { Interaction } from 'discord.js';
+import { Events, Interaction } from 'discord.js';
 import { BotEvent } from '../@types/types';
 
 const event: BotEvent = {
-  name: 'interactionCreate',
-  execute: (interaction: any) => {
-    if (interaction.isChatInputCommand()) {
-      let command = interaction.client.slashCommands.get(interaction.commandName);
-      let cooldown = interaction.client.cooldowns.get(
-        `${interaction.commandName}-${interaction.user.username}`
-      );
-      if (!command) return;
-      if (command.cooldown && cooldown) {
-        if (Date.now() < cooldown) {
-          interaction.reply(
-            `You have to wait ${Math.floor(
-              Math.abs(Date.now() - cooldown) / 1000
-            )} second(s) to use this command again.`
-          );
-          setTimeout(() => interaction.deleteReply(), 5000);
-          return;
-        }
-        interaction.client.cooldowns.set(
-          `${interaction.commandName}-${interaction.user.username}`,
-          Date.now() + command.cooldown * 1000
-        );
-        setTimeout(() => {
-          interaction.client.cooldowns.delete(
-            `${interaction.commandName}-${interaction.user.username}`
-          );
-        }, command.cooldown * 1000);
-      } else if (command.cooldown && !cooldown) {
-        interaction.client.cooldowns.set(
-          `${interaction.commandName}-${interaction.user.username}`,
-          Date.now() + command.cooldown * 1000
-        );
-      }
+  name: Events.InteractionCreate,
+  execute: (interaction: Interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    //@ts-ignore
+    const command = interaction.client.slashCommands.get(interaction.commandName);
+
+    if (!command) {
+      console.error(`No command matching ${interaction.commandName} was found.`);
+      return;
+    }
+
+    try {
       command.execute(interaction);
-    } else if (interaction.isAutocomplete()) {
-      const command = interaction.client.slashCommands.get(interaction.commandName);
-      if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
-      }
-      try {
-        if (!command.autocomplete) return;
-        command.autocomplete(interaction);
-      } catch (error) {
-        console.error(error);
+    } catch (error) {
+      console.error(error);
+      if (interaction.replied || interaction.deferred) {
+        interaction.followUp({
+          content: 'There was an error while executing this command! Ethan fucked up somewhere.',
+          ephemeral: true,
+        });
+      } else {
+        interaction.reply({
+          content: 'There was an error while executing this command! Ethan fucked up somewhere.',
+          ephemeral: true,
+        });
       }
     }
   },

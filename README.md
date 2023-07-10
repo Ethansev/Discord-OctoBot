@@ -12,7 +12,6 @@ Discord bot for my personal server. Basic implementation, but I'll implement res
 
 ## Future Plans
 
-- [ ] Add extra api functionalities
 - [ ] Add twitch stream announcement for Sid
 
 <!--
