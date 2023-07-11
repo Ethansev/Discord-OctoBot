@@ -12,14 +12,12 @@ import { BotEvent, SlashCommand } from './@types/types';
 import { color } from './utility/textColor.js';
 
 export class Client extends DiscordClient {
-  slashCommands: Collection<String, SlashCommand>;
-  // token: string | null;
-  GuildId?: string;
   commandsPath: string;
   eventsPath: string;
+  slashCommands: Collection<String, SlashCommand>;
   cooldowns?: Collection<string, number>;
 
-  public constructor(token?: string, GuildId?: string) {
+  public constructor() {
     super({
       intents: [
         GatewayIntentBits.Guilds,
@@ -34,8 +32,6 @@ export class Client extends DiscordClient {
     this.eventsPath = 'src/events';
 
     this.slashCommands = new Collection();
-    this.token = token || null;
-    this.GuildId = GuildId;
     this.cooldowns = new Collection<string, number>();
   }
 

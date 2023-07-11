@@ -5,7 +5,7 @@ import { Client } from './Client.js';
 run();
 
 async function run() {
-  const client = new Client(process.env.DISCORD_TOKEN, process.env.BOT_CHANNEL);
+  const client = new Client();
 
   await client.loadAllEvents();
   await client.loadAllCommands();

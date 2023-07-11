@@ -17,6 +17,9 @@ Discord bot for my personal server. Basic implementation but I'll continue to ad
 - [ ] Add twitch stream announcement for Sid
 - [ ] Give bot a dick~ish personality and have it respond to users
 - [ ] Containerize in a docker container
+- [ ] Add websocket for better connection to discord api
+- [ ] Persist data in a PostrgreSQL database (probably supabase)
+- [ ] Create a frontend dashboard for easier access
 
 ## Patch Notes
 
