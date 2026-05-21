@@ -1,42 +1,27 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Configuration, OpenAIApi } from 'openai';
-import { SlashCommand } from '../@types/types';
-
-const configuration = new Configuration({
-  organization: process.env.OPENAI_ORG_KEY, // Optional for most usage, preferred for enterprise usage
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { SlashCommand } from '../@types/types.js';
+import { chatComplete } from '../services/openai.js';
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName('chatgpt')
     .setDescription('Give any prompt and let AI respond.')
     .addStringOption((option) =>
-      option.setName('prompt').setDescription('The user to ping').setRequired(true)
+      option.setName('prompt').setDescription('The prompt to send').setRequired(true)
     ),
-  async execute(interaction: CommandInteraction) {
-    const prompt = (interaction.options as any).getString('prompt');
-    const openai = new OpenAIApi(configuration);
+  async execute(interaction: ChatInputCommandInteraction) {
+    const prompt = interaction.options.getString('prompt', true);
 
     await interaction.deferReply();
 
     try {
-      const response = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'system', content: prompt }],
-        max_tokens: 450,
+      const answer = await chatComplete(prompt);
+      await interaction.editReply(`**Prompt:** ${prompt}\n\n${answer}`);
+    } catch (error) {
+      console.error('chatgpt command failed:', error);
+      await interaction.editReply({
+        content: 'Oh no we made an oopsie woopsie. 30 minute lunch break brb',
       });
-
-      let replyText = `Prompt: ${prompt} \n\n`;
-      response.data.choices.map((choice, index) => {
-        const content = (choice.message && choice.message.content) || '';
-        replyText = replyText.concat(`Answer ${index + 1}: ${content} \n\n`);
-      });
-
-      await interaction.editReply(replyText);
-    } catch (error: any) {
-      interaction.reply('Oh no we made an oopsie woopsie. 30 minute lunch break brb');
-      console.log(error.message);
     }
   },
 };

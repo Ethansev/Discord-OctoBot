@@ -1,43 +1,83 @@
-import { Events, Interaction, Message } from 'discord.js';
-import { BotEvent } from '../@types/types';
 import axios from 'axios';
+import {
+  AttachmentBuilder,
+  Events,
+  GuildMember,
+  Message,
+  TextChannel,
+} from 'discord.js';
+import { quotesData } from '../seeds/callOfDutyQuotes.js';
+import type { BotEvent } from '../@types/types.js';
+import { config } from '../config.js';
+import { findYourMomTrigger } from '../utility/triggers.js';
+
+async function fetchYourMomJoke(): Promise<string> {
+  const response = await axios.get('https://api.yomomma.info/');
+  return response.data.joke;
+}
+
+async function handleEmojiReactions(message: Message): Promise<boolean> {
+  if (message.content.includes(':bettermoyai:')) {
+    await message.reply('<:othermoyai:1004468892334297148>');
+    return true;
+  }
+  if (message.content.includes(':othermoyai:')) {
+    await message.reply('<:bettermoyai:1004470188877561977>');
+    return true;
+  }
+  if (message.content.includes('🗿')) {
+    await message.reply('fuck off');
+    return true;
+  }
+  return false;
+}
+
+async function handleJoelKick(message: Message): Promise<boolean> {
+  if (!config.discord.joelUserId) return false;
+  if (message.author.id !== config.discord.joelUserId) return false;
+  if (message.system || !message.guild) return false;
+
+  const member = message.guild.members.cache.get(message.author.id) as GuildMember | undefined;
+  if (!member?.kickable) return false;
+
+  const quote = quotesData[Math.floor(Math.random() * quotesData.length)];
+  const channel = message.guild.channels.cache.find(
+    (ch) => ch.name === config.discord.botCommandsChannel
+  );
+
+  try {
+    const file = new AttachmentBuilder('./media/Ether_Griffguyen.png');
+    await message.author.send({ files: [file] }).catch(() => undefined);
+    await message.author.send('fuck you Joel').catch(() => undefined);
+
+    if (channel && channel instanceof TextChannel) {
+      await channel.send(
+        `"*${quote.quote}*" - ${quote.author}\n\n**Joel got dicked :)**`
+      );
+    }
+
+    await member.kick('Joel posted in chat.');
+    return true;
+  } catch (error) {
+    console.error('Joel-kick failed:', error);
+    return false;
+  }
+}
 
 const event: BotEvent = {
   name: Events.MessageCreate,
   execute: async (message: Message) => {
     if (message.author.bot) return;
 
-    // probably worth splitting these into separate functions
+    if (await handleJoelKick(message)) return;
+    if (await handleEmojiReactions(message)) return;
 
-    // kicks Joel every time he messages in chat
-    // let joel = 240328297483993091;
-    // if(msg.author.id == joel && msg.system === false){
-    //     await msg.author.send({files: ["./media/Ether_Griffguyen.png"]});
-    //     await msg.author.send(`fuck you Joel ${newInvite}`);
-    //     const member = msg.guild.members.cache.get(msg.author.id);
-    //     const channel = msg.guild.channels.cache.find(ch => ch.name === 'bot-commands');
-    //     channel ? channel.send(`"*${randomQuote.quote}*" - ${randomQuote.author} \n\n**Joel got dicked :)**`) : null;
-    //     member.kick();
-    // }
-
-    if (message.content.includes(':bettermoyai:'))
-      message.reply('<:othermoyai:1004468892334297148>');
-    if (message.content.includes(':othermoyai:'))
-      message.reply('<:bettermoyai:1004470188877561977>');
-    if (message.content.includes('🗿')) message.reply('fuck off');
-
-    const yourMom = new Set(['mommy', 'mother', 'mama', 'momma', 'mom', 'mamma', 'mum']);
-    for (let word of message.content.split(' ')) {
-      if (yourMom.has(word.toLowerCase())) {
-        const getYourMomJoke = async () => {
-          const response = await axios.get(`https://api.yomomma.info/`);
-          const joke = response.data.joke;
-          return joke;
-        };
-        const jokeValue = await getYourMomJoke();
-        console.log(jokeValue);
-        message.reply(jokeValue);
-        return;
+    if (findYourMomTrigger(message.content)) {
+      try {
+        const joke = await fetchYourMomJoke();
+        await message.reply(joke);
+      } catch (error) {
+        console.error('your-momma joke fetch failed:', error);
       }
     }
   },

@@ -1,8 +1,6 @@
-import 'dotenv/config';
 import { Events } from 'discord.js';
 import { Client } from './Client.js';
-
-run();
+import { config } from './config.js';
 
 async function run() {
   const client = new Client();
@@ -11,12 +9,15 @@ async function run() {
   await client.loadAllCommands();
 
   client.once(Events.ClientReady, (c) => {
-    console.log(`I am ready! Logged in as ${client.user!.tag}`);
+    console.log(`I am ready! Logged in as ${c.user.tag}`);
   });
 
   try {
-    client.login(process.env.DISCORD_TOKEN);
+    await client.login(config.discord.token);
   } catch (error) {
-    console.log(`Error logging in: ${error}`);
+    console.error('Error logging in:', error);
+    process.exit(1);
   }
 }
+
+run();

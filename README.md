@@ -1,39 +1,65 @@
 # OctoBot
 
-Discord bot for my personal server. Basic implementation but I'll continue to add to it.
+Discord bot for my personal server.
 
 ## Features
 
-- Adds -poo to the end of new user's name. (The server theme is toilet paper)
+- Adds `-poo` to the end of new users' nicknames. (Server theme: toilet paper.)
 - Responds to certain emojis with another emoji.
-- Tells a your momma joke anytime the word 'mom' (and other iterations) appears.
-- Slash commands for ChatGPT
-- <s>Kicks Joel out of the server whenever he types in chat. </s>
+- Tells a your-momma joke whenever the word "mom" (and variants) appears.
+- `/chatgpt` slash command — prompts OpenAI.
+- Kicks Joel whenever he types in chat (configurable via env var).
 
-## Future Plans
+## Feature flags
 
-- [x] Refactor to Typescript
-- [ ] Add music functionality for voice chat (spotify, youtube, soundcloud)
-- [ ] Add twitch stream announcement for Sid
-- [ ] Give bot a dick~ish personality and have it respond to users
-- [ ] Containerize in a docker container
-- [ ] Add websocket for better connection to discord api
-- [ ] Persist data in a PostrgreSQL database (probably supabase)
-- [ ] Create a frontend dashboard for easier access
+Each opt-in feature is toggled via env var. `true` enables, anything else (or unset) disables.
 
-## Patch Notes
+| Flag                       | Default | Description                                          |
+| -------------------------- | ------- | ---------------------------------------------------- |
+| `FEATURE_AI_PERSONALITY`   | `false` | Bot replies to @mentions/replies with an AI persona. |
+| `FEATURE_TWITCH_ANNOUNCER` | `false` | Announce when a Twitch streamer goes live.          |
+| `FEATURE_MUSIC`            | `false` | Voice channel music playback.                       |
 
-### v1.0 - July 7, 2023
-- Refactored to Typescript and restructured logic. No feature additions, minor optimizations.  
+Each flag's implementation lands in its own PR (see `todo/`).
 
+## Setup (local)
 
-## Installation
+```sh
+# Volta picks up the pinned Node version automatically
+npm install
+cp sample.env .env   # fill in DISCORD_TOKEN, APPLICATION_ID, OPENAI_API_KEY
+npm run dev
+```
 
-1. add environment variables
-2. npm run build
-3. npm run start
+Scripts:
 
-<!--
-Purpose
-Features
--->
+- `npm run dev` — `tsx watch` (no build step, reloads on change)
+- `npm run build` — compile to `dist/`
+- `npm start` — run the compiled bot from `dist/`
+- `npm run typecheck` — TS noEmit check
+- `npm test` — vitest
+
+## Deployment
+
+Docker / Portainer instructions land in PR 2 — see `todo/02-dockerize.md`.
+
+## Roadmap
+
+See `todo/` for the active modernization + feature plan. Items still on the wish list past that:
+
+- [ ] Persist state in Postgres (Supabase).
+- [ ] Frontend dashboard for managing config without env vars.
+
+## Patch notes
+
+### v1.1 — 2026-05-21
+- Updated `discord.js` to current `14.x`, `openai` to `v6`, `typescript` to `v6`.
+- Rewrote OpenAI integration to use the v4+ SDK shape (`client.chat.completions.create`).
+- Removed dead deps: `@discordjs/builders`, `@discordjs/core`, `ts-loader`, `source-map-loader`, `ts-node`, `ts-node-dev`, `nodemon`, `eslint`, unused `express`/`@types/express`.
+- Fixed: unawaited async command execution, reply-after-defer mismatch, deprecated `ephemeral: true`.
+- Added: typed `config` module with feature flags, OpenAI service for reuse, vitest test setup.
+- Re-enabled Joel-kick (env-configurable).
+- Deleted unused `src/server.ts`.
+
+### v1.0 — 2023-07-07
+- Refactored to TypeScript. No feature additions, minor optimizations.

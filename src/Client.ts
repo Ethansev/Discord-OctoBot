@@ -3,21 +3,25 @@ import {
   Collection,
   GatewayIntentBits,
   Partials,
-  SlashCommandBuilder,
   REST,
   Routes,
+  SharedSlashCommand,
 } from 'discord.js';
-import { readdirSync } from 'fs';
-import { BotEvent, SlashCommand } from './@types/types';
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { BotEvent, SlashCommand } from './@types/types.js';
+import { config } from './config.js';
 import { color } from './utility/textColor.js';
 
-export class Client extends DiscordClient {
-  commandsPath: string;
-  eventsPath: string;
-  slashCommands: Collection<String, SlashCommand>;
-  cooldowns?: Collection<string, number>;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-  public constructor() {
+export class Client extends DiscordClient {
+  readonly commandsPath = path.join(__dirname, 'slashCommands');
+  readonly eventsPath = path.join(__dirname, 'events');
+  slashCommands: Collection<string, SlashCommand>;
+
+  constructor() {
     super({
       intents: [
         GatewayIntentBits.Guilds,
@@ -25,66 +29,52 @@ export class Client extends DiscordClient {
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
       ],
-      partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+      partials: [Partials.Message, Partials.Channel],
     });
 
-    this.commandsPath = 'src/slashCommands';
-    this.eventsPath = 'src/events';
-
     this.slashCommands = new Collection();
-    this.cooldowns = new Collection<string, number>();
   }
-
-  // Eventually move to these to their own classes
 
   loadAllCommands = async () => {
     console.log('Loading commands...');
 
-    const slashCommands: SlashCommandBuilder[] = [];
-    // looping through commands folder for each file which contains a Command object
-    const filePromises = readdirSync(this.commandsPath).map(async (file) => {
-      if (file.endsWith('.ts') || file.endsWith('.js')) {
-        await import(`./slashCommands/${file}`).then(async (commandObject) => {
-          const command: SlashCommand = commandObject.default;
-          slashCommands.push(command.command);
-          this.slashCommands.set(command.command.name, command);
-          console.log(`Loaded slash command ${file}`);
-        });
-      }
-    });
+    const builders: SharedSlashCommand[] = [];
 
-    try {
-      await Promise.all(filePromises);
-      console.log(`Started refreshing ${slashCommands.length} application (/) commands.`);
-      const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!);
-      const data = (await rest.put(Routes.applicationCommands(process.env.APPLICATION_ID!), {
-        body: slashCommands,
-      })) as any;
+    const files = readdirSync(this.commandsPath).filter(
+      (f) => f.endsWith('.ts') || f.endsWith('.js')
+    );
 
-      console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-    } catch (error) {
-      console.log('Something went wrong!');
-      console.error(error);
+    for (const file of files) {
+      const mod = await import(path.join(this.commandsPath, file));
+      const slashCommand: SlashCommand = mod.default;
+      builders.push(slashCommand.command);
+      this.slashCommands.set(slashCommand.command.name, slashCommand);
+      console.log(`Loaded slash command ${file}`);
     }
+
+    const rest = new REST({ version: '10' }).setToken(config.discord.token);
+    console.log(`Registering ${builders.length} application (/) commands...`);
+
+    const data = (await rest.put(Routes.applicationCommands(config.discord.applicationId), {
+      body: builders,
+    })) as unknown[];
+
+    console.log(`Successfully registered ${data.length} application (/) commands.`);
   };
 
   loadAllEvents = async () => {
     console.log('Loading events...');
 
-    const eventFiles = readdirSync(this.eventsPath).filter(
-      (f) => f.endsWith('.js') || f.endsWith('.ts')
+    const files = readdirSync(this.eventsPath).filter(
+      (f) => f.endsWith('.ts') || f.endsWith('.js')
     );
 
-    for (const file of eventFiles) {
-      // TODO: make the import better
-      await import(`../${this.eventsPath}/${file}`).then((eventObject) => {
-        const event: BotEvent = eventObject.default;
-        event.once
-          ? this.once(event.name, (...args) => event.execute(...args))
-          : this.on(event.name, (...args) => event.execute(...args));
-
-        console.log(color('text', `🌠 Successfully loaded event ${color('variable', event.name)}`));
-      });
+    for (const file of files) {
+      const mod = await import(path.join(this.eventsPath, file));
+      const event: BotEvent = mod.default;
+      const handler = (...args: unknown[]) => event.execute(...args);
+      event.once ? this.once(event.name, handler) : this.on(event.name, handler);
+      console.log(color('text', `🌠 Successfully loaded event ${color('variable', event.name)}`));
     }
   };
 }

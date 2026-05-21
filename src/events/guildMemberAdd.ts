@@ -1,13 +1,22 @@
 import { Events, GuildMember, TextChannel } from 'discord.js';
-import { BotEvent } from '../@types/types';
+import type { BotEvent } from '../@types/types.js';
+import { config } from '../config.js';
 
 const event: BotEvent = {
   name: Events.GuildMemberAdd,
   execute: async (member: GuildMember) => {
-    member.setNickname(`${member.user.username}poo`);
-    const channel = member.guild.channels.cache.find((ch) => ch.name === 'bot-commands');
-    // voice channels do not have a send() method so we need to specify the channel type
-    channel ? (channel as TextChannel).send(`Hi ${member}. We added ~poo to your name!`) : null;
+    try {
+      await member.setNickname(`${member.user.username}poo`);
+    } catch (error) {
+      console.error(`Failed to set nickname for ${member.user.username}:`, error);
+    }
+
+    const channel = member.guild.channels.cache.find(
+      (ch) => ch.name === config.discord.botCommandsChannel
+    );
+    if (channel instanceof TextChannel) {
+      await channel.send(`Hi ${member}. We added ~poo to your name!`);
+    }
   },
 };
 
