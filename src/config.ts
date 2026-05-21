@@ -13,9 +13,9 @@ function flag(name: string): boolean {
 }
 
 const features = {
-  aiPersonality: flag('FEATURE_AI_PERSONALITY'),
-  twitchAnnouncer: flag('FEATURE_TWITCH_ANNOUNCER'),
-  music: flag('FEATURE_MUSIC'),
+  aiPersonality: flag('FF_AI_PERSONALITY'),
+  twitchAnnouncer: flag('FF_TWITCH_ANNOUNCER'),
+  music: flag('FF_MUSIC'),
 };
 
 export const config = {
@@ -30,6 +30,11 @@ export const config = {
     apiKey: required('OPENAI_API_KEY'),
     model: process.env.OPENAI_MODEL ?? 'gpt-4o-mini',
     orgKey: process.env.OPENAI_ORG_KEY,
+  },
+  aiPersonality: {
+    promptFile: process.env.AI_PERSONALITY_PROMPT_FILE ?? 'prompts/ai-personality.md',
+    cooldownSeconds: Number(process.env.AI_PERSONALITY_COOLDOWN_SECONDS ?? '10'),
+    maxInputChars: 2000,
   },
 };
 

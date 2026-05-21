@@ -14,11 +14,13 @@ Discord bot for my personal server.
 
 Each opt-in feature is toggled via env var. `true` enables, anything else (or unset) disables.
 
-| Flag                       | Default | Description                                          |
-| -------------------------- | ------- | ---------------------------------------------------- |
-| `FEATURE_AI_PERSONALITY`   | `false` | Bot replies to @mentions/replies with an AI persona. |
-| `FEATURE_TWITCH_ANNOUNCER` | `false` | Announce when a Twitch streamer goes live.          |
-| `FEATURE_MUSIC`            | `false` | Voice channel music playback.                       |
+| Flag                  | Default | Description                                          |
+| --------------------- | ------- | ---------------------------------------------------- |
+| `FF_AI_PERSONALITY`   | `false` | Bot replies to @mentions/replies with an AI persona. |
+| `FF_TWITCH_ANNOUNCER` | `false` | Announce when a Twitch streamer goes live.          |
+| `FF_MUSIC`            | `false` | Voice channel music playback.                       |
+
+The AI personality's system prompt is loaded from `prompts/ai-personality.md`. Edit that file to tune the persona (no redeploy needed for local dev; rebuild image for Docker).
 
 Each flag's implementation lands in its own PR (see `todo/`).
 
@@ -57,6 +59,10 @@ See `todo/` for the active modernization + feature plan. Items still on the wish
 - [ ] Frontend dashboard for managing config without env vars.
 
 ## Patch notes
+
+### v1.3 — 2026-05-21
+- Added `FF_AI_PERSONALITY` — when on, the bot replies to @mentions and replies-to-bot with an AI persona via OpenAI. System prompt is editable at `prompts/ai-personality.md`. Per-user cooldown (default 10s) reacts with ⏳ instead of replying when rate-limited.
+- Renamed feature flag prefix from `FEATURE_*` to `FF_*`.
 
 ### v1.2 — 2026-05-21
 - Containerized with a multi-stage Alpine Dockerfile + `docker-compose.yml`.

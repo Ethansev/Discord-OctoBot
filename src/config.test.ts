@@ -46,9 +46,9 @@ describe('config', () => {
   });
 
   test('feature flags accept "true" (case-insensitive)', async () => {
-    process.env.FEATURE_AI_PERSONALITY = 'true';
-    process.env.FEATURE_TWITCH_ANNOUNCER = 'TRUE';
-    process.env.FEATURE_MUSIC = 'True';
+    process.env.FF_AI_PERSONALITY = 'true';
+    process.env.FF_TWITCH_ANNOUNCER = 'TRUE';
+    process.env.FF_MUSIC = 'True';
     const config = await loadConfig();
     expect(config.features.aiPersonality).toBe(true);
     expect(config.features.twitchAnnouncer).toBe(true);
@@ -56,9 +56,9 @@ describe('config', () => {
   });
 
   test('feature flags reject non-"true" values', async () => {
-    process.env.FEATURE_AI_PERSONALITY = '1';
-    process.env.FEATURE_TWITCH_ANNOUNCER = 'yes';
-    process.env.FEATURE_MUSIC = 'on';
+    process.env.FF_AI_PERSONALITY = '1';
+    process.env.FF_TWITCH_ANNOUNCER = 'yes';
+    process.env.FF_MUSIC = 'on';
     const config = await loadConfig();
     expect(config.features.aiPersonality).toBe(false);
     expect(config.features.twitchAnnouncer).toBe(false);

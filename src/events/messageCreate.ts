@@ -9,6 +9,7 @@ import {
 import { quotesData } from '../seeds/callOfDutyQuotes.js';
 import type { BotEvent } from '../@types/types.js';
 import { config } from '../config.js';
+import * as aiPersonality from '../services/aiPersonality.js';
 import { findYourMomTrigger } from '../utility/triggers.js';
 
 async function fetchYourMomJoke(): Promise<string> {
@@ -64,12 +65,26 @@ async function handleJoelKick(message: Message): Promise<boolean> {
   }
 }
 
+async function shouldRunAiPersonality(message: Message): Promise<boolean> {
+  if (!config.features.aiPersonality) return false;
+  const botUser = message.client.user;
+  if (!botUser) return false;
+  if (message.mentions.has(botUser)) return true;
+  return await aiPersonality.isReplyToBot(message);
+}
+
 const event: BotEvent = {
   name: Events.MessageCreate,
   execute: async (message: Message) => {
     if (message.author.bot) return;
 
     if (await handleJoelKick(message)) return;
+
+    if (await shouldRunAiPersonality(message)) {
+      await aiPersonality.respond(message);
+      return;
+    }
+
     if (await handleEmojiReactions(message)) return;
 
     if (findYourMomTrigger(message.content)) {

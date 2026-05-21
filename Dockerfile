@@ -25,6 +25,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
 COPY media ./media
+COPY prompts ./prompts
 
 RUN addgroup -S bot && adduser -S bot -G bot \
     && chown -R bot:bot /app
