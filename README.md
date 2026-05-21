@@ -60,6 +60,9 @@ See `todo/` for the active modernization + feature plan. Items still on the wish
 
 ## Patch notes
 
+### v1.4 — 2026-05-21
+- Added `FF_TWITCH_ANNOUNCER` — when on, polls Twitch Helix (default every 60s) and posts an embed to the configured channel when the streamer goes live. Known limitation: a restart while the streamer is live re-announces on the next poll, since the live/offline transition is tracked in memory.
+
 ### v1.3 — 2026-05-21
 - Added `FF_AI_PERSONALITY` — when on, the bot replies to @mentions and replies-to-bot with an AI persona via OpenAI. System prompt is editable at `prompts/ai-personality.md`. Per-user cooldown (default 10s) reacts with ⏳ instead of replying when rate-limited.
 - Renamed feature flag prefix from `FEATURE_*` to `FF_*`.

@@ -36,6 +36,13 @@ export const config = {
     cooldownSeconds: Number(process.env.AI_PERSONALITY_COOLDOWN_SECONDS ?? '10'),
     maxInputChars: 2000,
   },
+  twitch: {
+    clientId: process.env.TWITCH_CLIENT_ID,
+    clientSecret: process.env.TWITCH_CLIENT_SECRET,
+    streamerUsername: process.env.TWITCH_STREAMER_USERNAME,
+    announceChannelId: process.env.TWITCH_ANNOUNCE_CHANNEL_ID,
+    pollIntervalSeconds: Number(process.env.TWITCH_POLL_INTERVAL_SECONDS ?? '60'),
+  },
 };
 
 export type Config = typeof config;
