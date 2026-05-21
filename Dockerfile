@@ -20,6 +20,9 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
+# ffmpeg is required by discord-player when FF_MUSIC is enabled.
+RUN apk add --no-cache ffmpeg
+
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 

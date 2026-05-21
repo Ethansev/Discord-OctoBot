@@ -60,6 +60,9 @@ See `todo/` for the active modernization + feature plan. Items still on the wish
 
 ## Patch notes
 
+### v1.5 — 2026-05-21
+- Added `FF_MUSIC` — when on, voice channel music playback via [`discord-player`](https://discord-player.js.org). Slash commands `/play /skip /queue /stop /pause /resume` are only registered with Discord when the flag is on, so they don't appear in the picker when disabled. Adds the `GuildVoiceStates` intent (harmless when the flag is off). Sources supported out of the box: SoundCloud, Spotify (metadata), Vimeo, Apple Music, plain attachments — YouTube is not in the default extractor bundle. The Docker runtime now installs `ffmpeg`.
+
 ### v1.4 — 2026-05-21
 - Added `FF_TWITCH_ANNOUNCER` — when on, polls Twitch Helix (default every 60s) and posts an embed to the configured channel when the streamer goes live. Known limitation: a restart while the streamer is live re-announces on the next poll, since the live/offline transition is tracked in memory.
 

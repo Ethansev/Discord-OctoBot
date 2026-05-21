@@ -1,6 +1,7 @@
 import { Events } from 'discord.js';
 import { Client } from './Client.js';
 import { config } from './config.js';
+import { initMusicPlayer } from './services/musicPlayer.js';
 import * as twitchAnnouncer from './services/twitchAnnouncer.js';
 
 async function run() {
@@ -15,6 +16,14 @@ async function run() {
 
   if (config.features.twitchAnnouncer) {
     client.once(Events.ClientReady, () => twitchAnnouncer.start(client));
+  }
+
+  if (config.features.music) {
+    client.once(Events.ClientReady, () => {
+      initMusicPlayer(client).catch((error) => {
+        console.error('Failed to initialize music player:', error);
+      });
+    });
   }
 
   try {
