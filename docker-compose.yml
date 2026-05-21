@@ -1,0 +1,8 @@
+services:
+  bot:
+    build: .
+    image: discord-octobot:latest
+    container_name: discord-octobot
+    restart: unless-stopped
+    env_file:
+      - .env

@@ -39,9 +39,15 @@ Scripts:
 - `npm run typecheck` — TS noEmit check
 - `npm test` — vitest
 
-## Deployment
+## Docker
 
-Docker / Portainer instructions land in PR 2 — see `todo/02-dockerize.md`.
+The bot ships with a multi-stage Alpine `Dockerfile` and `docker-compose.yml`:
+
+```sh
+cp sample.env .env   # fill in secrets
+docker compose up -d --build
+docker compose logs -f bot
+```
 
 ## Roadmap
 
@@ -51,6 +57,9 @@ See `todo/` for the active modernization + feature plan. Items still on the wish
 - [ ] Frontend dashboard for managing config without env vars.
 
 ## Patch notes
+
+### v1.2 — 2026-05-21
+- Containerized with a multi-stage Alpine Dockerfile + `docker-compose.yml`.
 
 ### v1.1 — 2026-05-21
 - Updated `discord.js` to current `14.x`, `openai` to `v6`, `typescript` to `v6`.
