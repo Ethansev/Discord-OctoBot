@@ -1,6 +1,7 @@
 import { Client, TextChannel } from 'discord.js';
 import { Player } from 'discord-player';
 import { DefaultExtractors } from '@discord-player/extractor';
+import { log } from '../utility/logger.js';
 
 interface QueueMetadata {
   channel?: TextChannel;
@@ -21,7 +22,7 @@ export async function initMusicPlayer(client: Client): Promise<Player> {
     const player = new Player(client as unknown as ConstructorParameters<typeof Player>[0]);
     await player.extractors.loadMulti(DefaultExtractors);
     attachEvents(player);
-    console.log(`Music player ready (${player.extractors.size} extractors loaded)`);
+    log.info('music', `player ready (${player.extractors.size} extractors loaded)`);
     playerInstance = player;
     return player;
   })();
@@ -35,33 +36,37 @@ export function getMusicPlayer(): Player | undefined {
 
 function attachEvents(player: Player): void {
   player.events.on('playerStart', (queue, track) => {
+    log.info('music', `playerStart: "${track.title}" by ${track.author}`);
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send(`Now playing: **${track.title}**`).catch(() => undefined);
   });
 
   player.events.on('audioTrackAdd', (queue, track) => {
+    log.info('music', `queued: "${track.title}" by ${track.author}`);
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send(`Queued: **${track.title}**`).catch(() => undefined);
   });
 
   player.events.on('disconnect', (queue) => {
+    log.info('music', 'disconnected from voice');
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send('Disconnected from voice.').catch(() => undefined);
   });
 
   player.events.on('emptyChannel', (queue) => {
+    log.info('music', 'voice channel empty, leaving');
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send('Voice channel empty, leaving.').catch(() => undefined);
   });
 
   player.events.on('error', (queue, error) => {
-    console.error('Music player error:', error);
+    log.error('music', 'player error', error);
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send(`Music error: ${error.message}`).catch(() => undefined);
   });
 
   player.events.on('playerError', (queue, error) => {
-    console.error('Music player track error:', error);
+    log.error('music', 'track playback error', error);
     const channel = (queue.metadata as QueueMetadata | undefined)?.channel;
     channel?.send(`Track playback error: ${error.message}`).catch(() => undefined);
   });

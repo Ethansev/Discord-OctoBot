@@ -3,6 +3,7 @@ import { Client } from './Client.js';
 import { config } from './config.js';
 import { initMusicPlayer } from './services/musicPlayer.js';
 import * as twitchAnnouncer from './services/twitchAnnouncer.js';
+import { log } from './utility/logger.js';
 
 async function run() {
   const client = new Client();
@@ -11,8 +12,23 @@ async function run() {
   await client.loadAllCommands();
 
   client.once(Events.ClientReady, (c) => {
-    console.log(`I am ready! Logged in as ${c.user.tag}`);
+    log.info('bot', `I am ready! Logged in as ${c.user.tag} (${c.user.id})`);
   });
+
+  client.on('error', (err) => log.error('bot', 'Discord client error', err));
+  client.on('warn', (msg) => log.warn('bot', msg));
+  client.on(Events.ShardError, (err, shardId) =>
+    log.error('bot', `shard ${shardId} error`, err)
+  );
+  client.on(Events.ShardDisconnect, (event, shardId) =>
+    log.warn('bot', `shard ${shardId} disconnected (code=${event.code}, reason=${event.reason || 'n/a'})`)
+  );
+  client.on(Events.ShardReconnecting, (shardId) =>
+    log.info('bot', `shard ${shardId} reconnecting`)
+  );
+  client.on(Events.ShardResume, (shardId, replayed) =>
+    log.info('bot', `shard ${shardId} resumed (replayed ${replayed} events)`)
+  );
 
   if (config.features.twitchAnnouncer) {
     client.once(Events.ClientReady, () => twitchAnnouncer.start(client));
@@ -21,7 +37,7 @@ async function run() {
   if (config.features.music) {
     client.once(Events.ClientReady, () => {
       initMusicPlayer(client).catch((error) => {
-        console.error('Failed to initialize music player:', error);
+        log.error('music', 'failed to initialize music player', error);
       });
     });
   }
@@ -30,7 +46,7 @@ async function run() {
   const shutdown = (signal: string) => {
     if (shuttingDown) return;
     shuttingDown = true;
-    console.log(`Received ${signal}, shutting down...`);
+    log.info('bot', `received ${signal}, shutting down...`);
     if (config.features.twitchAnnouncer) twitchAnnouncer.stop();
     client.destroy().finally(() => process.exit(0));
   };
@@ -40,7 +56,7 @@ async function run() {
   try {
     await client.login(config.discord.token);
   } catch (error) {
-    console.error('Error logging in:', error);
+    log.error('bot', 'login failed', error);
     process.exit(1);
   }
 }

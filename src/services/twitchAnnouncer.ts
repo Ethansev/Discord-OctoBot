@@ -1,5 +1,6 @@
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
 import { config } from '../config.js';
+import { log } from '../utility/logger.js';
 import { isLive, type HelixStream } from './twitch.js';
 
 let wasLive = false;
@@ -45,26 +46,35 @@ async function pollOnce(client: Client): Promise<void> {
   try {
     const stream = await isLive(streamerUsername!);
     if (stream && !wasLive) {
+      log.info(
+        'twitch',
+        `${stream.user_login} went LIVE: "${stream.title}" (${stream.game_name}, ${stream.viewer_count} viewers)`
+      );
       const channel = await client.channels.fetch(announceChannelId!);
       if (channel instanceof TextChannel) {
         await channel.send({ embeds: [buildEmbed(stream)] });
+        log.info('twitch', `announcement posted to #${channel.name}`);
       } else {
-        console.warn(
-          `Twitch announcer: channel ${announceChannelId} is not a TextChannel, skipping announcement.`
+        log.warn(
+          'twitch',
+          `channel ${announceChannelId} is not a TextChannel, skipping announcement`
         );
       }
+    } else if (!stream && wasLive) {
+      log.info('twitch', `${streamerUsername} went offline`);
     }
     wasLive = !!stream;
   } catch (error) {
-    console.error('Twitch announcer poll failed:', error);
+    log.error('twitch', 'poll failed', error);
   }
 }
 
 export function start(client: Client): void {
   validateConfig();
   const intervalMs = config.twitch.pollIntervalSeconds * 1000;
-  console.log(
-    `Twitch announcer: polling ${config.twitch.streamerUsername} every ${config.twitch.pollIntervalSeconds}s`
+  log.info(
+    'twitch',
+    `announcer started: polling ${config.twitch.streamerUsername} every ${config.twitch.pollIntervalSeconds}s`
   );
   void pollOnce(client);
   timer = setInterval(() => void pollOnce(client), intervalMs);
@@ -74,6 +84,7 @@ export function stop(): void {
   if (timer) {
     clearInterval(timer);
     timer = undefined;
+    log.info('twitch', 'announcer stopped');
   }
   wasLive = false;
 }

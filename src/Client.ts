@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { BotEvent, SlashCommand } from './@types/types.js';
 import { config } from './config.js';
+import { log } from './utility/logger.js';
 import { color } from './utility/textColor.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,13 +47,13 @@ export class Client extends DiscordClient {
       const slashCommand: SlashCommand = mod.default;
       builders.push(slashCommand.command);
       this.slashCommands.set(slashCommand.command.name, slashCommand);
-      console.log(`Loaded slash command ${label}/${entry.name}`);
+      log.info('bot', `loaded slash command ${label}/${entry.name}`);
     }
     return builders;
   };
 
   loadAllCommands = async () => {
-    console.log('Loading commands...');
+    log.info('bot', 'loading commands...');
 
     const builders: SharedSlashCommand[] = [];
     builders.push(...(await this.loadCommandsFrom(this.commandsPath, 'slashCommands')));
@@ -63,17 +64,17 @@ export class Client extends DiscordClient {
     }
 
     const rest = new REST({ version: '10' }).setToken(config.discord.token);
-    console.log(`Registering ${builders.length} application (/) commands...`);
+    log.info('bot', `registering ${builders.length} application (/) commands...`);
 
     const data = (await rest.put(Routes.applicationCommands(config.discord.applicationId), {
       body: builders,
     })) as unknown[];
 
-    console.log(`Successfully registered ${data.length} application (/) commands.`);
+    log.info('bot', `successfully registered ${data.length} application (/) commands`);
   };
 
   loadAllEvents = async () => {
-    console.log('Loading events...');
+    log.info('bot', 'loading events...');
 
     const files = readdirSync(this.eventsPath).filter(
       (f) => f.endsWith('.ts') || f.endsWith('.js')
@@ -84,7 +85,7 @@ export class Client extends DiscordClient {
       const event: BotEvent = mod.default;
       const handler = (...args: unknown[]) => event.execute(...args);
       event.once ? this.once(event.name, handler) : this.on(event.name, handler);
-      console.log(color('text', `🌠 Successfully loaded event ${color('variable', event.name)}`));
+      log.info('bot', color('text', `🌠 loaded event ${color('variable', event.name)}`));
     }
   };
 }

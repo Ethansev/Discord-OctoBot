@@ -1,5 +1,6 @@
 import { Events, Interaction, MessageFlags } from 'discord.js';
 import type { BotEvent } from '../@types/types.js';
+import { log } from '../utility/logger.js';
 
 const event: BotEvent = {
   name: Events.InteractionCreate,
@@ -8,14 +9,22 @@ const event: BotEvent = {
 
     const command = interaction.client.slashCommands.get(interaction.commandName);
     if (!command) {
-      console.error(`No command matching ${interaction.commandName} was found.`);
+      log.warn('cmd', `no command matching /${interaction.commandName} was found`);
       return;
     }
 
+    const where = interaction.guild ? `guild ${interaction.guild.name}` : 'DM';
+    log.info(
+      'cmd',
+      `/${interaction.commandName} invoked by ${interaction.user.tag} (${interaction.user.id}) in ${where}`
+    );
+
+    const start = Date.now();
     try {
       await command.execute(interaction);
+      log.info('cmd', `/${interaction.commandName} ok (${Date.now() - start}ms)`);
     } catch (error) {
-      console.error(`Error executing /${interaction.commandName}:`, error);
+      log.error('cmd', `/${interaction.commandName} failed (${Date.now() - start}ms)`, error);
       const content =
         'There was an error while executing this command! Ethan fucked up somewhere.';
       if (interaction.replied || interaction.deferred) {
