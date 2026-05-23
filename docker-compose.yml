@@ -4,5 +4,18 @@ services:
     image: discord-octobot:latest
     container_name: discord-octobot
     restart: unless-stopped
+    stop_grace_period: 15s
     env_file:
       - .env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

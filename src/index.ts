@@ -26,6 +26,17 @@ async function run() {
     });
   }
 
+  let shuttingDown = false;
+  const shutdown = (signal: string) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`Received ${signal}, shutting down...`);
+    if (config.features.twitchAnnouncer) twitchAnnouncer.stop();
+    client.destroy().finally(() => process.exit(0));
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+
   try {
     await client.login(config.discord.token);
   } catch (error) {
